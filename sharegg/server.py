@@ -1,5 +1,6 @@
 import sys
 
+from cors import crossdomain
 from flask import Flask, request, jsonify
 from sharegg import StatsCounter
 
@@ -21,6 +22,7 @@ def hello_world():
     return 'Hello World!'
 
 @app.route('/stats/<provider>')
+@crossdomain(origin='*')
 def get_shares(provider):
     url = request.args.get('url')
 
@@ -29,9 +31,9 @@ def get_shares(provider):
 
     SC = StatsCounter(url)
 
-    if provide == 'buffer':
+    if provider == 'buffer':
         return ok(SC.buffer())
-    elif provide == 'delicious':
+    elif provider == 'delicious':
         return ok(SC.delicious())
     elif provider in ['fb', 'facebook']:
         return ok(SC.facebook())
@@ -39,15 +41,15 @@ def get_shares(provider):
         return ok(SC.google_plus())
     elif provider in ['in', 'linkedin']:
         return ok(SC.linkedin())
-    elif provide == 'pinterest':
+    elif provider == 'pinterest':
         return ok(SC.pinterest())
-    elif provide == 'reddit':
+    elif provider == 'reddit':
         return ok(SC.reddit())
-    elif provide == 'stumbleupon':
+    elif provider == 'stumbleupon':
         return ok(SC.stumbleupon())
     elif provider == 'twitter':
         return ok(SC.twitter())
-    elif provide == 'youtube':
+    elif provider == 'youtube':
         return ok(SC.youtube())
     else:
         return error('Invalid provider name.')
@@ -55,6 +57,7 @@ def get_shares(provider):
     return error()
 
 @app.route('/stats')
+@crossdomain(origin='*')
 def get_stats():
     url = request.args.get('url')
 
