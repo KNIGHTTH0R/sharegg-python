@@ -2,13 +2,13 @@ import inspect
 import json
 import unirest
 
-_this = lambda: inspect.stack()[1][3]
+this = lambda: inspect.stack()[1][3]
 
-def _parse_jsonp(jsonp):
+def parse_jsonp(jsonp):
     x, y = jsonp.index('(') + 1, jsonp.rindex(')')
     return json.loads(jsonp[x:y])
 
-class StatsCounter(object):
+class Counter(object):
 
     def __init__(self, url):
         self.url = url
@@ -28,7 +28,7 @@ class StatsCounter(object):
         if res.code != 200:
             return None
 
-        return { 'shares': res.body.get('count', 0), 'url': url, 'provider': _this() }
+        return { 'shares': res.body.get('count', 0), 'url': url, 'provider': this() }
 
     def delicious(self, url=None):
         # FIX-ME: Not working?
@@ -41,7 +41,7 @@ class StatsCounter(object):
 
         r = res.body[0] if len(res.body) > 0 else {}
 
-        return { 'shares': r.get('total_posts', 0), 'url': url, 'provider': _this() }
+        return { 'shares': r.get('total_posts', 0), 'url': url, 'provider': this() }
 
     def digg(self, url=None):
         # TODO: implement
@@ -59,7 +59,7 @@ class StatsCounter(object):
 
         r = res.body[0]
 
-        return { 'shares': r.get('share_count', 0), 'likes': r.get('like_count', 0), 'url': r.get('url', url), 'provider': _this() }
+        return { 'shares': r.get('share_count', 0), 'likes': r.get('like_count', 0), 'url': r.get('url', url), 'provider': this() }
 
     def google_plus(self, url=None):
         url = self._get_url(url)
@@ -92,9 +92,9 @@ class StatsCounter(object):
         if res.code != 200:
             return 0
 
-        r = _parse_jsonp(res.body)
+        r = parse_jsonp(res.body)
 
-        return { 'shares': r.get('count', 0), 'url': r.get('url', url), 'provider': _this() }
+        return { 'shares': r.get('count', 0), 'url': r.get('url', url), 'provider': this() }
 
     def pinterest(self, url=None):
         url = self._get_url(url)
@@ -103,9 +103,9 @@ class StatsCounter(object):
         if res.code != 200:
             return None
 
-        r = _parse_jsonp(res.body)
+        r = parse_jsonp(res.body)
 
-        return { 'shares': r.get('count', 0), 'url': r.get('url', url), 'provider': _this() }
+        return { 'shares': r.get('count', 0), 'url': r.get('url', url), 'provider': this() }
 
     def pocket(self, url=None):
         # TODO: implement
@@ -128,7 +128,7 @@ class StatsCounter(object):
             downs += data.get('downs', 0)
             score += data.get('score')
 
-        return { 'ups' : ups, 'downs' : downs, 'score' : score, 'url': url, 'provider': _this() }
+        return { 'ups' : ups, 'downs' : downs, 'score' : score, 'url': url, 'provider': this() }
 
     def stumbleupon(self, url=None):
         url = self._get_url(url)
@@ -139,7 +139,7 @@ class StatsCounter(object):
 
         r = res.body.get('result', {})
 
-        return { 'views': r.get('views', 0), 'url': r.get('url', url), 'provider': _this() }
+        return { 'views': r.get('views', 0), 'url': r.get('url', url), 'provider': this() }
 
     def twitter(self, url=None):
         url = self._get_url(url)
@@ -148,7 +148,7 @@ class StatsCounter(object):
         if res.code != 200:
             return None
 
-        return { 'shares': res.body.get('count', 0), 'url': res.body.get('url', url), 'provider': _this() }
+        return { 'shares': res.body.get('count', 0), 'url': res.body.get('url', url), 'provider': this() }
 
     def tumblr(self, url=None):
         # TODO: implement
@@ -167,17 +167,17 @@ class StatsCounter(object):
                  'likes': r.get('yt$rating', {}).get('numLikes', 0),
                  'dislikes': r.get('yt$rating', {}).get('numDislikes', 0),
                  'url': 'https://www.youtube.com/v/%s' % url,
-                 'provider': _this() }
+                 'provider': this() }
 
 if __name__ == '__main__':
-    SC = StatsCounter('http://www.google.com')
-    print('Buffer = %s' % SC.buffer())
-    print('Delicious = %s' % SC.delicious())
-    print('Facebook = %s' % SC.facebook())
-    print('G+ = %s' % SC.google_plus())
-    print('Linkedin = %s' % SC.linkedin())
-    print('Pinterest = %s' % SC.pinterest())
-    print('Reddit = %s' % SC.reddit('http://i.imgur.com/To3DQ6J.jpg'))
-    print('StumbleUpon = %s' % SC.stumbleupon())
-    print('Twitter = %s' % SC.twitter())
-    print('YouTube = %s' % SC.youtube('uT3SBzmDxGk'))
+    C = Counter('http://www.google.com')
+    print('Buffer = %s' % C.buffer())
+    print('Delicious = %s' % C.delicious())
+    print('Facebook = %s' % C.facebook())
+    print('G+ = %s' % C.google_plus())
+    print('Linkedin = %s' % C.linkedin())
+    print('Pinterest = %s' % C.pinterest())
+    print('Reddit = %s' % C.reddit('http://i.imgur.com/To3DQ6J.jpg'))
+    print('StumbleUpon = %s' % C.stumbleupon())
+    print('Twitter = %s' % C.twitter())
+    print('YouTube = %s' % C.youtube('uT3SBzmDxGk'))

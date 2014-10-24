@@ -6,7 +6,6 @@ try:
 except ImportError:
     from distutils.core import setup
 
-
 with open('LICENSE') as f:
     license = f.read()
 
@@ -28,6 +27,7 @@ setup(
     long_description=description,
     keywords='',
     platforms='',
+    install_requires=['Flask', 'unirest'],
     classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Programming Language :: Python',
