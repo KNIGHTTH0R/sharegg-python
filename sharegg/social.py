@@ -51,6 +51,7 @@ class Counter(object):
         url = self._get_url(url)
 
         # FIX-ME: This api is deprecated.
+        # 'http://graph.facebook.com/?id=' + url
         # 'https://api.facebook.com/method/fql.query?query=' + encode( "SELECT total_count, url FROM link_stat WHERE url='" + url + "'" ) + '&format=json&callback=' );
         res = unirest.get('http://api.facebook.com/restserver.php?method=links.getStats&urls=%s&format=json' % url)
 
@@ -65,7 +66,7 @@ class Counter(object):
         url = self._get_url(url)
         data = [{ 'method' : 'pos.plusones.get',
                   'id' : 'p',
-                  'params': { 'nolog' : True, 
+                  'params': { 'nolog' : True,
                               'id' : url,
                               'source' : 'widget',
                               'userId' : '@viewer',
@@ -156,6 +157,18 @@ class Counter(object):
 
     def youtube(self, url=None):
         url = self._get_url(url)
+
+        if '?' in url:
+            query = url = url[url.find('?') + 1:]
+            params = query.split('&')
+
+            for p in params:
+                v = p.split('=')
+
+                if len(v)== 2 and v[0] == 'v':
+                    url = v[1]
+                    break
+
         res = unirest.get('https://gdata.youtube.com/feeds/api/videos/%s?v=2&alt=json' % url)
 
         if res.code != 200:
@@ -170,14 +183,14 @@ class Counter(object):
                  'provider': this() }
 
 if __name__ == '__main__':
-    C = Counter('http://www.google.com')
+    C = Counter('https://www.youtube.com/watch?v=9bZkp7q19f0')
     print('Buffer = %s' % C.buffer())
     print('Delicious = %s' % C.delicious())
     print('Facebook = %s' % C.facebook())
     print('G+ = %s' % C.google_plus())
     print('Linkedin = %s' % C.linkedin())
     print('Pinterest = %s' % C.pinterest())
-    print('Reddit = %s' % C.reddit('http://i.imgur.com/To3DQ6J.jpg'))
+    print('Reddit = %s' % C.reddit())
     print('StumbleUpon = %s' % C.stumbleupon())
     print('Twitter = %s' % C.twitter())
-    print('YouTube = %s' % C.youtube('uT3SBzmDxGk'))
+    print('YouTube = %s' % C.youtube())
