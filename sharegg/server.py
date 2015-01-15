@@ -51,6 +51,8 @@ def get_shares(provider):
         return ok(C.twitter())
     elif provider == 'youtube':
         return ok(C.youtube())
+    elif provider in ['vk', 'vkontakte']:
+        return ok(C.vkontakte())
     else:
         return error('Invalid provider name.')
 
@@ -75,7 +77,8 @@ def get_stats():
              C.reddit(),
              C.stumbleupon(),
              C.twitter(),
-             C.youtube(),]
+             C.youtube(),
+             C.vkontakte(),]
 
     data = {}
 

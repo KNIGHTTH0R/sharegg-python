@@ -1,5 +1,6 @@
 import inspect
 import json
+import re
 import unirest
 
 this = lambda: inspect.stack()[1][3]
@@ -155,6 +156,22 @@ class Counter(object):
         # TODO: implement
         return None
 
+    def vkontakte(self, url=None):
+        url = self._get_url(url)
+        res = unirest.get('https://vk.com/share.php?act=count&url=%s' % url)
+
+        if res.code != 200:
+            return None
+
+        m = re.match('VK.Share.count\([0-9]+, (?P<count>[0-9]+)\);', res.body)
+
+        if m:
+            count = m.group('count')
+        else:
+            count = 0
+
+        return { 'count': count, 'url': url, 'provider': this() }
+
     def youtube(self, url=None):
         url = self._get_url(url)
 
@@ -193,4 +210,5 @@ if __name__ == '__main__':
     print('Reddit = %s' % C.reddit())
     print('StumbleUpon = %s' % C.stumbleupon())
     print('Twitter = %s' % C.twitter())
+    print('VK = %s' % C.vkontakte())
     print('YouTube = %s' % C.youtube())
