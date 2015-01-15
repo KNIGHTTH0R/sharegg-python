@@ -29,7 +29,7 @@ class Counter(object):
         if res.code != 200:
             return None
 
-        return { 'shares': res.body.get('count', 0), 'url': url, 'provider': this() }
+        return { 'shares': res.body.get('shares', 0), 'url': url, 'provider': this() }
 
     def delicious(self, url=None):
         # FIX-ME: Not working?
