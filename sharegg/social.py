@@ -1,3 +1,4 @@
+import hashlib
 import inspect
 import json
 import re
@@ -11,7 +12,7 @@ def parse_jsonp(jsonp):
 
 class Counter(object):
 
-    def __init__(self, url):
+    def __init__(self, url=None):
         self.url = url
 
     def _get_url(self, url):
@@ -32,17 +33,23 @@ class Counter(object):
         return { 'shares': res.body.get('shares', 0), 'url': url, 'provider': this() }
 
     def delicious(self, url=None):
-        # FIX-ME: Not working?
         url = self._get_url(url)
 
-        res = unirest.get('http://feeds.delicious.com/v2/json/urlinfo/data?url=%s' % url)
+        # FIX-ME: Not working?
+        # res = unirest.get('http://feeds.delicious.com/v2/json/urlinfo/data?url=%s' % url)
+        # if res.code != 200:
+        #     return None
+        # r = res.body[0] if len(res.body) > 0 else {}
+        # return { 'shares': r.get('total_posts', 0), 'url': url, 'provider': this() }
+
+        res = unirest.get('https://avosapi.delicious.com/api/v1/posts/md5/%s' % hashlib.md5(url).hexdigest())
 
         if res.code != 200:
             return None
 
-        r = res.body[0] if len(res.body) > 0 else {}
+        r = res.body.get('pkg', [{}])[0]
 
-        return { 'shares': r.get('total_posts', 0), 'url': url, 'provider': this() }
+        return { 'shares': r.get('num_saves', 0), 'url': url, 'provider': this() }
 
     def digg(self, url=None):
         # TODO: implement
