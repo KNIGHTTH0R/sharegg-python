@@ -25,7 +25,7 @@ Get social count/shares/likes easily.
 from sharegg.social import Counter
 ```
 
-#### Contructor
+#### Constructor
 
 ```python
 C = Counter(url=None)
