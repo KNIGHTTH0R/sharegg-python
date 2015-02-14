@@ -31,34 +31,35 @@ def get_shares(service):
 
     C = Counter(url)
 
-    if service == 'buffer':
-        return ok(C.buffer())
-    elif service == 'delicious':
-        return ok(C.delicious())
-    elif service in ['fb', 'facebook']:
-        return ok(C.facebook())
-    elif service in ['g+', 'google', 'googleplus']:
-        return ok(C.google_plus())
-    elif service in ['in', 'linkedin']:
-        return ok(C.linkedin())
-    elif service == 'pinterest':
-        return ok(C.pinterest())
-    elif service == 'pocket':
-        return ok(C.pocket())
-    elif service == 'reddit':
-        return ok(C.reddit())
-    elif service == 'stumbleupon':
-        return ok(C.stumbleupon())
-    elif service == 'twitter':
-        return ok(C.twitter())
-    elif service == 'youtube':
-        return ok(C.youtube())
-    elif service in ['vk', 'vkontakte']:
-        return ok(C.vkontakte())
-    else:
-        return error('Invalid service name.')
-
-    return error()
+    try:
+        if service == 'buffer':
+            return ok(C.buffer())
+        elif service == 'delicious':
+            return ok(C.delicious())
+        elif service in ['fb', 'facebook']:
+            return ok(C.facebook())
+        elif service in ['g+', 'google', 'googleplus']:
+            return ok(C.google_plus())
+        elif service in ['in', 'linkedin']:
+            return ok(C.linkedin())
+        elif service == 'pinterest':
+            return ok(C.pinterest())
+        elif service == 'pocket':
+            return ok(C.pocket())
+        elif service == 'reddit':
+            return ok(C.reddit())
+        elif service == 'stumbleupon':
+            return ok(C.stumbleupon())
+        elif service == 'twitter':
+            return ok(C.twitter())
+        elif service == 'youtube':
+            return ok(C.youtube())
+        elif service in ['vk', 'vkontakte']:
+            return ok(C.vkontakte())
+        else:
+            return error('Invalid service name.')
+    except:
+        return error('Can\'t retrieve information data.')
 
 @app.route('/stats')
 @crossdomain(origin='*')

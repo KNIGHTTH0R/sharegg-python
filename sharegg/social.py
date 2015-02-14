@@ -49,7 +49,13 @@ class Counter(object):
         if res.code != 200:
             return None
 
-        r = res.body.get('pkg', [{}])[0]
+        r = res.body.get('pkg', [{}])
+
+        # Invalid URL returns None.
+        if r is None:
+            r = {}
+        else:
+            r = r[0]
 
         return { 'shares': r.get('num_saves', 0), 'url': url, 'service': this() }
 
