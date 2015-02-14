@@ -18,8 +18,8 @@ def error(msg='Unknown error.', code=400):
     return status({ 'message' : msg }, code)
 
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+def root():
+    return 'Sharegg server is running.'
 
 @app.route('/stats/<service>')
 @crossdomain(origin='*')
