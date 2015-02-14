@@ -11,11 +11,19 @@ Get social count/shares/likes easily.
 - Google Plus
 - Linkedin
 - Pinterest
+- Pocket
 - Reddit
 - StumbleUpon
 - Twitter
 - VK
 - YouTube
+
+### Requirements
+
+- Python 2.7+
+- BeautifulSoup
+- Flask
+- Unirest
 
 ### Usage
 

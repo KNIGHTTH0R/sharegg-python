@@ -43,6 +43,8 @@ def get_shares(service):
         return ok(C.linkedin())
     elif service == 'pinterest':
         return ok(C.pinterest())
+    elif service == 'pocket':
+        return ok(C.pocket())
     elif service == 'reddit':
         return ok(C.reddit())
     elif service == 'stumbleupon':

@@ -6,11 +6,17 @@ try:
 except ImportError:
     from distutils.core import setup
 
-with open('LICENSE') as f:
-    license = f.read()
+try:
+    with open('LICENSE') as f:
+        license = f.read()
+except:
+    license = 'MIT'
 
-with open('README.rst') as f:
-    description = f.read()
+try:
+    with open('README.rst') as f:
+        description = f.read()
+except:
+    description = ''
 
 setup(
     name='sharegg',
@@ -27,7 +33,7 @@ setup(
     long_description=description,
     keywords='',
     platforms='',
-    install_requires=['Flask', 'unirest'],
+    install_requires=['beautifulsoup4', 'Flask', 'unirest'],
     classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Programming Language :: Python',

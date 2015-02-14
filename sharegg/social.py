@@ -4,6 +4,8 @@ import json
 import re
 import unirest
 
+from bs4 import BeautifulSoup
+
 this = lambda: inspect.stack()[1][3]
 
 def parse_jsonp(jsonp):
@@ -117,8 +119,17 @@ class Counter(object):
         return { 'shares': r.get('count', 0), 'url': r.get('url', url), 'service': this() }
 
     def pocket(self, url=None):
-        # TODO: implement
-        return None
+        url = self._get_url(url)
+        res = unirest.get('https://widgets.getpocket.com/v1/button?align=center&count=vertical&label=pocket&url=%s' % url)
+
+        if res.code != 200:
+            return None
+
+        html = res.raw_body
+        soup = BeautifulSoup(html)
+        cnt = soup.find(id="cnt")
+
+        return { 'count': cnt.text, 'url': url, 'service': this() }
 
     def reddit(self, url=None):
         url = self._get_url(url)
@@ -214,6 +225,7 @@ if __name__ == '__main__':
     print('G+ = %s' % C.google_plus())
     print('Linkedin = %s' % C.linkedin())
     print('Pinterest = %s' % C.pinterest())
+    print('Pocket = %s' % C.pocket())
     print('Reddit = %s' % C.reddit())
     print('StumbleUpon = %s' % C.stumbleupon())
     print('Twitter = %s' % C.twitter())
