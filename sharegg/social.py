@@ -30,7 +30,7 @@ class Counter(object):
         if res.code != 200:
             return None
 
-        return { 'shares': res.body.get('shares', 0), 'url': url, 'provider': this() }
+        return { 'shares': res.body.get('shares', 0), 'url': url, 'service': this() }
 
     def delicious(self, url=None):
         url = self._get_url(url)
@@ -40,7 +40,7 @@ class Counter(object):
         # if res.code != 200:
         #     return None
         # r = res.body[0] if len(res.body) > 0 else {}
-        # return { 'shares': r.get('total_posts', 0), 'url': url, 'provider': this() }
+        # return { 'shares': r.get('total_posts', 0), 'url': url, 'service': this() }
 
         res = unirest.get('https://avosapi.delicious.com/api/v1/posts/md5/%s' % hashlib.md5(url).hexdigest())
 
@@ -49,7 +49,7 @@ class Counter(object):
 
         r = res.body.get('pkg', [{}])[0]
 
-        return { 'shares': r.get('num_saves', 0), 'url': url, 'provider': this() }
+        return { 'shares': r.get('num_saves', 0), 'url': url, 'service': this() }
 
     def digg(self, url=None):
         # TODO: implement
@@ -68,7 +68,7 @@ class Counter(object):
 
         r = res.body[0]
 
-        return { 'shares': r.get('share_count', 0), 'likes': r.get('like_count', 0), 'url': r.get('url', url), 'provider': this() }
+        return { 'shares': r.get('share_count', 0), 'likes': r.get('like_count', 0), 'url': r.get('url', url), 'service': this() }
 
     def google_plus(self, url=None):
         url = self._get_url(url)
@@ -92,7 +92,7 @@ class Counter(object):
 
         r = res.body[0].get('result', {})
 
-        return { 'shares': r.get('metadata', {}).get('globalCounts', {}).get('count', 0), 'url': r.get('id', url), 'provider': 'g+' }
+        return { 'shares': r.get('metadata', {}).get('globalCounts', {}).get('count', 0), 'url': r.get('id', url), 'service': 'g+' }
 
     def linkedin(self, url=None):
         url = self._get_url(url)
@@ -103,7 +103,7 @@ class Counter(object):
 
         r = parse_jsonp(res.body)
 
-        return { 'shares': r.get('count', 0), 'url': r.get('url', url), 'provider': this() }
+        return { 'shares': r.get('count', 0), 'url': r.get('url', url), 'service': this() }
 
     def pinterest(self, url=None):
         url = self._get_url(url)
@@ -114,7 +114,7 @@ class Counter(object):
 
         r = parse_jsonp(res.body)
 
-        return { 'shares': r.get('count', 0), 'url': r.get('url', url), 'provider': this() }
+        return { 'shares': r.get('count', 0), 'url': r.get('url', url), 'service': this() }
 
     def pocket(self, url=None):
         # TODO: implement
@@ -137,7 +137,7 @@ class Counter(object):
             downs += data.get('downs', 0)
             score += data.get('score')
 
-        return { 'ups' : ups, 'downs' : downs, 'score' : score, 'url': url, 'provider': this() }
+        return { 'ups' : ups, 'downs' : downs, 'score' : score, 'url': url, 'service': this() }
 
     def stumbleupon(self, url=None):
         url = self._get_url(url)
@@ -148,7 +148,7 @@ class Counter(object):
 
         r = res.body.get('result', {})
 
-        return { 'views': r.get('views', 0), 'url': r.get('url', url), 'provider': this() }
+        return { 'views': r.get('views', 0), 'url': r.get('url', url), 'service': this() }
 
     def twitter(self, url=None):
         url = self._get_url(url)
@@ -157,7 +157,7 @@ class Counter(object):
         if res.code != 200:
             return None
 
-        return { 'shares': res.body.get('count', 0), 'url': res.body.get('url', url), 'provider': this() }
+        return { 'shares': res.body.get('count', 0), 'url': res.body.get('url', url), 'service': this() }
 
     def tumblr(self, url=None):
         # TODO: implement
@@ -177,7 +177,7 @@ class Counter(object):
         else:
             count = 0
 
-        return { 'count': count, 'url': url, 'provider': this() }
+        return { 'count': count, 'url': url, 'service': this() }
 
     def youtube(self, url=None):
         url = self._get_url(url)
@@ -204,7 +204,7 @@ class Counter(object):
                  'likes': r.get('yt$rating', {}).get('numLikes', 0),
                  'dislikes': r.get('yt$rating', {}).get('numDislikes', 0),
                  'url': 'https://www.youtube.com/v/%s' % url,
-                 'provider': this() }
+                 'service': this() }
 
 if __name__ == '__main__':
     C = Counter('https://www.youtube.com/watch?v=9bZkp7q19f0')

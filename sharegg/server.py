@@ -21,9 +21,9 @@ def error(msg='Unknown error.', code=400):
 def hello_world():
     return 'Hello World!'
 
-@app.route('/stats/<provider>')
+@app.route('/stats/<service>')
 @crossdomain(origin='*')
-def get_shares(provider):
+def get_shares(service):
     url = request.args.get('url')
 
     if not url:
@@ -31,30 +31,30 @@ def get_shares(provider):
 
     C = Counter(url)
 
-    if provider == 'buffer':
+    if service == 'buffer':
         return ok(C.buffer())
-    elif provider == 'delicious':
+    elif service == 'delicious':
         return ok(C.delicious())
-    elif provider in ['fb', 'facebook']:
+    elif service in ['fb', 'facebook']:
         return ok(C.facebook())
-    elif provider in ['g+', 'google', 'googleplus']:
+    elif service in ['g+', 'google', 'googleplus']:
         return ok(C.google_plus())
-    elif provider in ['in', 'linkedin']:
+    elif service in ['in', 'linkedin']:
         return ok(C.linkedin())
-    elif provider == 'pinterest':
+    elif service == 'pinterest':
         return ok(C.pinterest())
-    elif provider == 'reddit':
+    elif service == 'reddit':
         return ok(C.reddit())
-    elif provider == 'stumbleupon':
+    elif service == 'stumbleupon':
         return ok(C.stumbleupon())
-    elif provider == 'twitter':
+    elif service == 'twitter':
         return ok(C.twitter())
-    elif provider == 'youtube':
+    elif service == 'youtube':
         return ok(C.youtube())
-    elif provider in ['vk', 'vkontakte']:
+    elif service in ['vk', 'vkontakte']:
         return ok(C.vkontakte())
     else:
-        return error('Invalid provider name.')
+        return error('Invalid service name.')
 
     return error()
 
@@ -84,7 +84,7 @@ def get_stats():
 
     for stat in stats:
         if not stat: continue
-        data[stat['provider']] = stat
+        data[stat['service']] = stat
 
     return ok(data)
 
