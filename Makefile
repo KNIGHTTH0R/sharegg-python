@@ -1,4 +1,4 @@
-all: clean build install
+all: clean build rst install
 
 build:
 	python setup.py build
@@ -10,6 +10,9 @@ dist:
 
 install:
 	python setup.py install -f
+
+rst:
+	pandoc --from=markdown_github --to=rst README.md>README.rst
 
 pypi: clean build dist
 
