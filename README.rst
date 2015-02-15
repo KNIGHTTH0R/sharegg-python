@@ -1,7 +1,7 @@
 sharegg
 =======
 
-A tint library to get social count/followers/likes/shares easily.
+A tiny library to get social count/followers/likes/shares easily.
 
 Supported services
 ~~~~~~~~~~~~~~~~~~
