@@ -1,7 +1,7 @@
 sharegg
 =======
 
-Get social count/followers/likes/shares easily.
+A tint library to get social count/followers/likes/shares easily.
 
 ### Supported services
 
@@ -22,6 +22,7 @@ Get social count/followers/likes/shares easily.
 #### Followers Count
 
 - G+
+- SoundCloud
 - Twitter
 
 #### Others Count
@@ -61,6 +62,7 @@ C.youtube(id=None)
 
 # Followers
 F.google_plus(id=None)
+F.soundcloud(id=None)
 F.twitter(id=None)
 
 # Shares
@@ -111,6 +113,7 @@ print('VK = %s' % S.vkontakte())
 
 F = Followers(gplus_key=gplus_key, twitter_auth=twitter_auth)
 print('G+ = %s' % F.google_plus('+google'))
+print('SoundCloud = %s' % F.soundcloud('soundcloud'))
 print('Twitter = %s' % F.twitter('twitter'))
 
 C = Counter('https://www.youtube.com/watch?v=9bZkp7q19f0')
@@ -134,8 +137,15 @@ Twitter = {'count': 49482, 'id': u'https://www.youtube.com/watch/?v=9bZkp7q19f0'
 VK = {'count': 881, 'id': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'vkontakte'}
 
 G+ = {'count': 10438727, 'id': u'https://plus.google.com/+google', 'service': 'google_plus'}
+SoundCloud = {'count': 341298, 'id': u'http://soundcloud.com/soundcloud', 'service': 'soundcloud'}
 Twitter = {'count': 35259091, 'id': u'twitter', 'service': 'twitter'}
 
 Reddit = {'service': 'reddit', 'downs': 0, 'shares': 25, 'id': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'score': 1284, 'ups': 1284}
 YouTube = {'service': 'youtube', 'views': u'2242979096', 'dislikes': u'1205252', 'likes': u'9115933', 'favorites': u'0', 'id': 'https://www.youtube.com/v/9bZkp7q19f0'}
 ```
+
+### Getting access tokens
+
+- [Facebook](https://developers.facebook.com/tools/access_token/)
+- [Google Plus](https://developers.google.com/+/api/oauth)
+- [Twitter](https://dev.twitter.com/oauth/overview/application-owner-access-tokens)
