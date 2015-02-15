@@ -138,7 +138,7 @@ VK = {'count': 881, 'id': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'servic
 
 G+ = {'count': 10438727, 'id': u'https://plus.google.com/+google', 'service': 'google_plus'}
 SoundCloud = {'count': 341298, 'id': u'http://soundcloud.com/soundcloud', 'service': 'soundcloud'}
-Twitter = {'count': 35259091, 'id': u'twitter', 'service': 'twitter'}
+Twitter = {'count': 35263966, 'id': u'https://twitter.com/twitter', 'service': 'twitter'}
 
 Reddit = {'service': 'reddit', 'downs': 0, 'shares': 25, 'id': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'score': 1284, 'ups': 1284}
 YouTube = {'service': 'youtube', 'views': u'2242979096', 'dislikes': u'1205252', 'likes': u'9115933', 'favorites': u'0', 'id': 'https://www.youtube.com/v/9bZkp7q19f0'}

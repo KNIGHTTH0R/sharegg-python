@@ -228,7 +228,8 @@ class Followers(SocialBase):
 
         if res.get('status') == '200':
             r = json.loads(body)[0]
-            return { 'count': r.get('followers_count', 0), 'id': r.get('screen_name', id), 'service': this() }
+            id = 'https://twitter.com/%s' % r.get('screen_name', id)
+            return { 'count': r.get('followers_count', 0), 'id': id, 'service': this() }
         else:
             return None
 
