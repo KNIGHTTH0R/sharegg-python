@@ -33,7 +33,7 @@ setup(
     long_description=description,
     keywords='',
     platforms='',
-    install_requires=['beautifulsoup4', 'Flask', 'oauth2', 'unirest'],
+    install_requires=['beautifulsoup4', 'oauth2', 'unirest'],
     classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Programming Language :: Python',

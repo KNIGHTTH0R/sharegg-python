@@ -1,9 +1,11 @@
 sharegg
 =======
 
-Get social count/shares/likes easily.
+Get social count/followers/likes/shares easily.
 
 ### Supported services
+
+#### Shares Count
 
 - Buffer
 - Delicious
@@ -16,13 +18,22 @@ Get social count/shares/likes easily.
 - StumbleUpon
 - Twitter
 - VK
-- YouTube
+
+#### Followers Count
+
+- G+
+- Twitter
+
+#### Others Count
+
+- Reddit (shares, score, up, down)
+- YouTube (views, favorites, likes, dislikes)
 
 ### Requirements
 
 - Python 2.7+
 - BeautifulSoup
-- Flask
+- OAuth2
 - Unirest
 
 ### Usage
@@ -30,74 +41,101 @@ Get social count/shares/likes easily.
 #### Import
 
 ```python
-from sharegg.social import Counter
+from sharegg.social import Counter, Followers, Shares
 ```
 
 #### Constructor
 
 ```python
-C = Counter(url=None)
+C = Counter(id=None)
+F = Followers(id=None)
+S = Shares(id=None)
 ```
 
 #### Functions
 
 ```python
-C.buffer(url=None)
-C.delicious(url=None)
-C.facebook(url=None)
-C.google_plus(url=None)
-C.linkedin(url=None)
-C.pinterest(url=None)
-C.reddit(url=None)
-C.stumbleupon(url=None)
-C.twitter(url=None)
-C.vkontakte(url=None)
-C.youtube(url=None)
+# Counter
+C.reddit(id=None)
+C.youtube(id=None)
+
+# Followers
+F.google_plus(id=None)
+F.twitter(id=None)
+
+# Shares
+S.buffer(id=None)
+S.delicious(id=None)
+S.facebook(id=None)
+S.google_plus(id=None)
+S.linkedin(id=None)
+S.pinterest(id=None)
+S.pocket(id=None)
+S.reddit(id=None)
+S.stumbleupon(id=None)
+S.twitter(id=None)
+S.vkontakte(id=None)
 ```
 
-Function `url` param will override class `url` param.
-If function and class url are a non valid value (`None`, `''`, ...), an error will be throw.
+Function `id` param will override class `id` param.
+If function and class id are a non valid value (`None`, `''`, ...), an error will be throw.
 
 ### Example
 
 ```python
-from sharegg.social import Counter
+from sharegg.social import Counter, Followers, Shares
+
+import os
+
+fb_token = os.environ.get('FB_TOKEN', '')
+gplus_key = os.environ.get('GPLUS_KEY', '')
+twitter_auth = {
+    'api_key': os.environ.get('TWITTER_API_KEY', ''),
+    'api_secret': os.environ.get('TWITTER_API_SECRET', ''),
+    'token_key': os.environ.get('TWITTER_TOKEN_KEY', ''),
+    'token_secret': os.environ.get('TWITTER_TOKEN_SECRET', ''),
+}
+
+S = Shares('https://www.youtube.com/watch?v=9bZkp7q19f0', fb_token=fb_token)
+print('Buffer = %s' % S.buffer())
+print('Delicious = %s' % S.delicious())
+print('Facebook = %s' % S.facebook())
+print('G+ = %s' % S.google_plus())
+print('Linkedin = %s' % S.linkedin())
+print('Pinterest = %s' % S.pinterest())
+print('Pocket = %s' % S.pocket())
+print('Reddit = %s' % S.reddit())
+print('StumbleUpon = %s' % S.stumbleupon())
+print('Twitter = %s' % S.twitter())
+print('VK = %s' % S.vkontakte())
+
+F = Followers(gplus_key=gplus_key, twitter_auth=twitter_auth)
+print('G+ = %s' % F.google_plus('+google'))
+print('Twitter = %s' % F.twitter('twitter'))
 
 C = Counter('https://www.youtube.com/watch?v=9bZkp7q19f0')
-
-print('Buffer = %s' % C.buffer())
-print('Delicious = %s' % C.delicious())
-print('Facebook = %s' % C.facebook())
-print('G+ = %s' % C.google_plus())
-print('Linkedin = %s' % C.linkedin())
-print('Pinterest = %s' % C.pinterest())
 print('Reddit = %s' % C.reddit())
-print('StumbleUpon = %s' % C.stumbleupon())
-print('Twitter = %s' % C.twitter())
-print('VK = %s' % C.vkontakte())
 print('YouTube = %s' % C.youtube())
 ```
 
 and the output will be
 
 ```
-Buffer = {'url': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'buffer', 'shares': 124}
-Delicious = {'url': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'delicious', 'shares': 14}
-Facebook = {'url': u'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'facebook', 'likes': 13292077, 'shares': 12732543}
-G+ = {'url': u'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'g+', 'shares': 719441.0}
-Linkedin = {'url': u'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'linkedin', 'shares': 994}
-Pinterest = {'url': u'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'pinterest', 'shares': 18}
-Reddit = {'url': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'downs': 0, 'score': 1281, 'ups': 1281, 'service': 'reddit'}
-StumbleUpon = {'url': u'http://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'stumbleupon', 'views': 6994}
-Twitter = {'url': u'https://www.youtube.com/watch/?v=9bZkp7q19f0', 'service': 'twitter', 'shares': 49312}
-VK = {'count': '880', 'url': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'vkontakte'}
-YouTube = {'url': 'https://www.youtube.com/v/9bZkp7q19f0', 'dislikes': u'1203592', 'likes': u'9108139', 'service': 'youtube', 'views': u'2240589305'}
+Buffer = {'count': 124, 'id': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'buffer'}
+Delicious = {'count': 14, 'id': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'delicious'}
+Facebook = {'count': 39474777, 'id': u'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'facebook'}
+G+ = {'count': 721806, 'id': u'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'google_plus'}
+Linkedin = {'count': 994, 'id': u'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'linkedin'}
+Pinterest = {'count': 19, 'id': u'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'pinterest'}
+Pocket = {'count': 11530, 'id': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'pocket'}
+Reddit = {'count': 25, 'id': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'reddit'}
+StumbleUpon = {'count': 6994, 'id': u'http://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'stumbleupon'}
+Twitter = {'count': 49482, 'id': u'https://www.youtube.com/watch/?v=9bZkp7q19f0', 'service': 'twitter'}
+VK = {'count': 881, 'id': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'service': 'vkontakte'}
+
+G+ = {'count': 10438727, 'id': u'https://plus.google.com/+google', 'service': 'google_plus'}
+Twitter = {'count': 35259091, 'id': u'twitter', 'service': 'twitter'}
+
+Reddit = {'service': 'reddit', 'downs': 0, 'shares': 25, 'id': 'https://www.youtube.com/watch?v=9bZkp7q19f0', 'score': 1284, 'ups': 1284}
+YouTube = {'service': 'youtube', 'views': u'2242979096', 'dislikes': u'1205252', 'likes': u'9115933', 'favorites': u'0', 'id': 'https://www.youtube.com/v/9bZkp7q19f0'}
 ```
-
-### Self hosting
-
-`python sharegg/server.py` or `python -m sharegg.server`
-
-### Server Deploy
-
-This project is built to be deployed on [OpenShift](https://www.openshift.com/). But you can run your own self hosted server too.

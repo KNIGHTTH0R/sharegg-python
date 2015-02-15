@@ -1,5 +1,3 @@
-__all__ = ["cors", "server", "social"]
+__all__ = ["social"]
 
-from cors import crossdomain
-from server import run
-from social import Shares, parse_jsonp, parse_int, this
+from social import SocialBase, Shares, Followers, Counter, parse_jsonp, parse_int, this

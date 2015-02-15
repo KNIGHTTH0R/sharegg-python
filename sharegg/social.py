@@ -190,22 +190,22 @@ class Shares(SocialBase):
 
 class Followers(SocialBase):
 
-    def __init__(self, id=None, gp_key=None, twitter_auth=None):
+    def __init__(self, id=None, gplus_key=None, twitter_auth=None):
         SocialBase.__init__(self, id)
-        self.gp_key = gp_key
+        self.gplus_key = gplus_key
         self.twitter_auth = twitter_auth or {}
 
     def google_plus(self, id=None):
         id = self._get_id(id)
 
-        res = unirest.get('https://www.googleapis.com/plus/v1/people/%s?key=%s' % (id, self.gp_key))
+        res = unirest.get('https://www.googleapis.com/plus/v1/people/%s?key=%s' % (id, self.gplus_key))
 
         if res.code != 200:
             return None
 
         count = res.body.get('plusOneCount', 0) or res.body.get('circledByCount', 0)
 
-        return { 'count': count, 'id': r.get('id', id), 'service': this() }
+        return { 'count': count, 'id': res.body.get('url', id), 'service': this() }
 
     def twitter(self, id=None):
         id = self._get_id(id)
@@ -277,7 +277,16 @@ class Counter(SocialBase):
 if __name__ == '__main__':
     import os
 
-    S = Shares('https://www.youtube.com/watch?v=9bZkp7q19f0', fb_token=os.environ.get('FB_TOKEN', ''))
+    fb_token = os.environ.get('FB_TOKEN', '')
+    gplus_key = os.environ.get('GPLUS_KEY', '')
+    twitter_auth = {
+        'api_key': os.environ.get('TWITTER_API_KEY', ''),
+        'api_secret': os.environ.get('TWITTER_API_SECRET', ''),
+        'token_key': os.environ.get('TWITTER_TOKEN_KEY', ''),
+        'token_secret': os.environ.get('TWITTER_TOKEN_SECRET', ''),
+    }
+
+    S = Shares('https://www.youtube.com/watch?v=9bZkp7q19f0', fb_token=fb_token)
     print('Buffer = %s' % S.buffer())
     print('Delicious = %s' % S.delicious())
     print('Facebook = %s' % S.facebook())
@@ -290,16 +299,9 @@ if __name__ == '__main__':
     print('Twitter = %s' % S.twitter())
     print('VK = %s' % S.vkontakte())
 
-    twitter_auth = {
-        'api_key': os.environ.get('TWITTER_API_KEY', ''),
-        'api_secret': os.environ.get('TWITTER_API_SECRET', ''),
-        'token_key': os.environ.get('TWITTER_TOKEN_KEY', ''),
-        'token_secret': os.environ.get('TWITTER_TOKEN_SECRET', ''),
-    }
-
-    F = Followers('google', gp_key=os.environ.get('GP_KEY', ''), twitter_auth=twitter_auth)
-    print('G+ = %s' % F.google_plus())
-    print('Twitter = %s' % F.twitter())
+    F = Followers(gplus_key=gplus_key, twitter_auth=twitter_auth)
+    print('G+ = %s' % F.google_plus('+google'))
+    print('Twitter = %s' % F.twitter('twitter'))
 
     C = Counter('https://www.youtube.com/watch?v=9bZkp7q19f0')
     print('Reddit = %s' % C.reddit())
