@@ -1,6 +1,7 @@
 import hashlib
 import inspect
 import json
+import oauth2
 import re
 import unirest
 
@@ -189,9 +190,10 @@ class Shares(SocialBase):
 
 class Followers(SocialBase):
 
-    def __init__(self, id=None, gp_key=None):
+    def __init__(self, id=None, gp_key=None, twitter_auth=None):
         SocialBase.__init__(self, id)
         self.gp_key = gp_key
+        self.twitter_auth = twitter_auth or {}
 
     def google_plus(self, id=None):
         id = self._get_id(id)
@@ -204,6 +206,20 @@ class Followers(SocialBase):
         count = res.body.get('plusOneCount', 0) or res.body.get('circledByCount', 0)
 
         return { 'count': count, 'id': r.get('id', id), 'service': this() }
+
+    def twitter(self, id=None):
+        id = self._get_id(id)
+
+        consumer = oauth2.Consumer(key=self.twitter_auth.get('api_key', ''), secret=self.twitter_auth.get('api_secret', ''))
+        token = oauth2.Token(key=self.twitter_auth.get('token_key', ''), secret=self.twitter_auth.get('token_secret', ''))
+        client = oauth2.Client(consumer, token)
+        res, body = client.request('https://api.twitter.com/1.1/users/lookup.json?screen_name=%s' % id, method='GET')
+
+        if res.get('status') == '200':
+            r = json.loads(body)[0]
+            return { 'count': r.get('followers_count', 0), 'id': r.get('screen_name', id), 'service': this() }
+        else:
+            return None
 
 class Counter(SocialBase):
 
@@ -274,8 +290,16 @@ if __name__ == '__main__':
     print('Twitter = %s' % S.twitter())
     print('VK = %s' % S.vkontakte())
 
-    F = Followers('google', gp_key=os.environ.get('GP_KEY', ''))
+    twitter_auth = {
+        'api_key': os.environ.get('TWITTER_API_KEY', ''),
+        'api_secret': os.environ.get('TWITTER_API_SECRET', ''),
+        'token_key': os.environ.get('TWITTER_TOKEN_KEY', ''),
+        'token_secret': os.environ.get('TWITTER_TOKEN_SECRET', ''),
+    }
+
+    F = Followers('google', gp_key=os.environ.get('GP_KEY', ''), twitter_auth=twitter_auth)
     print('G+ = %s' % F.google_plus())
+    print('Twitter = %s' % F.twitter())
 
     C = Counter('https://www.youtube.com/watch?v=9bZkp7q19f0')
     print('Reddit = %s' % C.reddit())
