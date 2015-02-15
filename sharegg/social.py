@@ -12,10 +12,17 @@ def parse_jsonp(jsonp):
     x, y = jsonp.index('(') + 1, jsonp.rindex(')')
     return json.loads(jsonp[x:y])
 
-class Counter(object):
+def parse_int(num):
+    if type(num) in [str, unicode]:
+        return int(num) if num.isdigit() else 0
 
-    def __init__(self, url=None):
+    return int(num)
+
+class Shares(object):
+
+    def __init__(self, url=None, fb_token=None):
         self.url = url
+        self.fb_token = fb_token
 
     def _get_url(self, url):
         url = url or self.url
@@ -32,7 +39,7 @@ class Counter(object):
         if res.code != 200:
             return None
 
-        return { 'shares': res.body.get('shares', 0), 'url': url, 'service': this() }
+        return { 'count': res.body.get('shares', 0), 'url': url, 'service': this() }
 
     def delicious(self, url=None):
         url = self._get_url(url)
@@ -42,7 +49,7 @@ class Counter(object):
         # if res.code != 200:
         #     return None
         # r = res.body[0] if len(res.body) > 0 else {}
-        # return { 'shares': r.get('total_posts', 0), 'url': url, 'service': this() }
+        # return { 'count': r.get('total_posts', 0), 'url': url, 'service': this() }
 
         res = unirest.get('https://avosapi.delicious.com/api/v1/posts/md5/%s' % hashlib.md5(url).hexdigest())
 
@@ -57,26 +64,17 @@ class Counter(object):
         else:
             r = r[0]
 
-        return { 'shares': r.get('num_saves', 0), 'url': url, 'service': this() }
-
-    def digg(self, url=None):
-        # TODO: implement
-        return None
+        return { 'count': r.get('num_saves', 0), 'url': url, 'service': this() }
 
     def facebook(self, url=None):
         url = self._get_url(url)
 
-        # FIX-ME: This api is deprecated.
-        # 'http://graph.facebook.com/?id=' + url
-        # 'https://api.facebook.com/method/fql.query?query=' + encode( "SELECT total_count, url FROM link_stat WHERE url='" + url + "'" ) + '&format=json&callback=' );
-        res = unirest.get('http://api.facebook.com/restserver.php?method=links.getStats&urls=%s&format=json' % url)
+        res = unirest.get('https://graph.facebook.com/v2.2/?access_token=%s&id=%s' % (self.fb_token, url))
 
         if res.code != 200:
             return None
 
-        r = res.body[0]
-
-        return { 'shares': r.get('share_count', 0), 'likes': r.get('like_count', 0), 'url': r.get('url', url), 'service': this() }
+        return { 'count': res.body.get('share', {}).get('share_count', 0), 'url': res.body.get('id', url), 'service': this() }
 
     def google_plus(self, url=None):
         url = self._get_url(url)
@@ -100,7 +98,7 @@ class Counter(object):
 
         r = res.body[0].get('result', {})
 
-        return { 'shares': r.get('metadata', {}).get('globalCounts', {}).get('count', 0), 'url': r.get('id', url), 'service': 'g+' }
+        return { 'count': parse_int(r.get('metadata', {}).get('globalCounts', {}).get('count', 0)), 'url': r.get('id', url), 'service': this() }
 
     def linkedin(self, url=None):
         url = self._get_url(url)
@@ -111,7 +109,7 @@ class Counter(object):
 
         r = parse_jsonp(res.body)
 
-        return { 'shares': r.get('count', 0), 'url': r.get('url', url), 'service': this() }
+        return { 'count': r.get('count', 0), 'url': r.get('url', url), 'service': this() }
 
     def pinterest(self, url=None):
         url = self._get_url(url)
@@ -122,7 +120,7 @@ class Counter(object):
 
         r = parse_jsonp(res.body)
 
-        return { 'shares': r.get('count', 0), 'url': r.get('url', url), 'service': this() }
+        return { 'count': r.get('count', 0), 'url': r.get('url', url), 'service': this() }
 
     def pocket(self, url=None):
         url = self._get_url(url)
@@ -135,7 +133,7 @@ class Counter(object):
         soup = BeautifulSoup(html)
         cnt = soup.find(id="cnt")
 
-        return { 'count': cnt.text, 'url': url, 'service': this() }
+        return { 'count': parse_int(cnt.text), 'url': url, 'service': this() }
 
     def reddit(self, url=None):
         url = self._get_url(url)
@@ -146,15 +144,7 @@ class Counter(object):
 
         infos = res.body.get('data', {}).get('children', [])
 
-        ups = downs = score = 0
-
-        for i in infos:
-            data = i.get('data', {})
-            ups += data.get('ups', 0)
-            downs += data.get('downs', 0)
-            score += data.get('score')
-
-        return { 'ups' : ups, 'downs' : downs, 'score' : score, 'url': url, 'service': this() }
+        return { 'count' : len(infos), 'url': url, 'service': this() }
 
     def stumbleupon(self, url=None):
         url = self._get_url(url)
@@ -165,7 +155,7 @@ class Counter(object):
 
         r = res.body.get('result', {})
 
-        return { 'views': r.get('views', 0), 'url': r.get('url', url), 'service': this() }
+        return { 'count': r.get('views', 0), 'url': r.get('url', url), 'service': this() }
 
     def twitter(self, url=None):
         url = self._get_url(url)
@@ -174,11 +164,7 @@ class Counter(object):
         if res.code != 200:
             return None
 
-        return { 'shares': res.body.get('count', 0), 'url': res.body.get('url', url), 'service': this() }
-
-    def tumblr(self, url=None):
-        # TODO: implement
-        return None
+        return { 'count': res.body.get('count', 0), 'url': res.body.get('url', url), 'service': this() }
 
     def vkontakte(self, url=None):
         url = self._get_url(url)
@@ -190,50 +176,24 @@ class Counter(object):
         m = re.match('VK.Share.count\([0-9]+, (?P<count>[0-9]+)\);', res.body)
 
         if m:
-            count = m.group('count')
+            count = parse_int(m.group('count'))
         else:
             count = 0
 
         return { 'count': count, 'url': url, 'service': this() }
 
-    def youtube(self, url=None):
-        url = self._get_url(url)
-
-        if '?' in url:
-            query = url = url[url.find('?') + 1:]
-            params = query.split('&')
-
-            for p in params:
-                v = p.split('=')
-
-                if len(v)== 2 and v[0] == 'v':
-                    url = v[1]
-                    break
-
-        res = unirest.get('https://gdata.youtube.com/feeds/api/videos/%s?v=2&alt=json' % url)
-
-        if res.code != 200:
-            return None
-
-        r = res.body.get('entry', {})
-
-        return { 'views': r.get('yt$statistics', {}).get('viewCount', 0),
-                 'likes': r.get('yt$rating', {}).get('numLikes', 0),
-                 'dislikes': r.get('yt$rating', {}).get('numDislikes', 0),
-                 'url': 'https://www.youtube.com/v/%s' % url,
-                 'service': this() }
-
 if __name__ == '__main__':
-    C = Counter('https://www.youtube.com/watch?v=9bZkp7q19f0')
-    print('Buffer = %s' % C.buffer())
-    print('Delicious = %s' % C.delicious())
-    print('Facebook = %s' % C.facebook())
-    print('G+ = %s' % C.google_plus())
-    print('Linkedin = %s' % C.linkedin())
-    print('Pinterest = %s' % C.pinterest())
-    print('Pocket = %s' % C.pocket())
-    print('Reddit = %s' % C.reddit())
-    print('StumbleUpon = %s' % C.stumbleupon())
-    print('Twitter = %s' % C.twitter())
-    print('VK = %s' % C.vkontakte())
-    print('YouTube = %s' % C.youtube())
+    import os
+
+    S = Shares('https://www.youtube.com/watch?v=9bZkp7q19f0', os.environ.get('FB_TOKEN', ''))
+    print('Buffer = %s' % S.buffer())
+    print('Delicious = %s' % S.delicious())
+    print('Facebook = %s' % S.facebook())
+    print('G+ = %s' % S.google_plus())
+    print('Linkedin = %s' % S.linkedin())
+    print('Pinterest = %s' % S.pinterest())
+    print('Pocket = %s' % S.pocket())
+    print('Reddit = %s' % S.reddit())
+    print('StumbleUpon = %s' % S.stumbleupon())
+    print('Twitter = %s' % S.twitter())
+    print('VK = %s' % S.vkontakte())

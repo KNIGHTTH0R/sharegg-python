@@ -9,4 +9,4 @@ if __name__ == '__main__':
 
     application.config['PROPAGATE_EXCEPTIONS'] = True
 
-    run(ip, port)
+    run(ip, port, fb_token=os.environ.get('FB_TOKEN', ''))
