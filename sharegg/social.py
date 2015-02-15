@@ -18,40 +18,45 @@ def parse_int(num):
 
     return int(num)
 
-class Shares(object):
+class SocialBase(object):
 
-    def __init__(self, url=None, fb_token=None):
-        self.url = url
+    def __init__(self, id=None):
+        self.id = id
+
+    def _get_id(self, id):
+        id = id or self.id
+
+        if not id:
+            raise ValueError('Missing or invalid id.')
+
+        return id
+
+class Shares(SocialBase):
+
+    def __init__(self, id=None, fb_token=None):
+        SocialBase.__init__(self, id)
         self.fb_token = fb_token
 
-    def _get_url(self, url):
-        url = url or self.url
-
-        if not url:
-            raise ValueError('Missing or invalid url.')
-
-        return url
-
-    def buffer(self, url=None):
-        url = self._get_url(url)
-        res = unirest.get('https://api.bufferapp.com/1/links/shares.json?url=%s' % url)
+    def buffer(self, id=None):
+        id = self._get_id(id)
+        res = unirest.get('https://api.bufferapp.com/1/links/shares.json?url=%s' % id)
 
         if res.code != 200:
             return None
 
-        return { 'count': res.body.get('shares', 0), 'url': url, 'service': this() }
+        return { 'count': res.body.get('shares', 0), 'id': id, 'service': this() }
 
-    def delicious(self, url=None):
-        url = self._get_url(url)
+    def delicious(self, id=None):
+        id = self._get_id(id)
 
         # FIX-ME: Not working?
-        # res = unirest.get('http://feeds.delicious.com/v2/json/urlinfo/data?url=%s' % url)
+        # res = unirest.get('http://feeds.delicious.com/v2/json/urlinfo/data?url=%s' % id)
         # if res.code != 200:
         #     return None
         # r = res.body[0] if len(res.body) > 0 else {}
-        # return { 'count': r.get('total_posts', 0), 'url': url, 'service': this() }
+        # return { 'count': r.get('total_posts', 0), 'id': id, 'service': this() }
 
-        res = unirest.get('https://avosapi.delicious.com/api/v1/posts/md5/%s' % hashlib.md5(url).hexdigest())
+        res = unirest.get('https://avosapi.delicious.com/api/v1/posts/md5/%s' % hashlib.md5(id).hexdigest())
 
         if res.code != 200:
             return None
@@ -64,24 +69,24 @@ class Shares(object):
         else:
             r = r[0]
 
-        return { 'count': r.get('num_saves', 0), 'url': url, 'service': this() }
+        return { 'count': r.get('num_saves', 0), 'id': id, 'service': this() }
 
-    def facebook(self, url=None):
-        url = self._get_url(url)
+    def facebook(self, id=None):
+        id = self._get_id(id)
 
-        res = unirest.get('https://graph.facebook.com/v2.2/?access_token=%s&id=%s' % (self.fb_token, url))
+        res = unirest.get('https://graph.facebook.com/v2.2/?access_token=%s&id=%s' % (self.fb_token, id))
 
         if res.code != 200:
             return None
 
-        return { 'count': res.body.get('share', {}).get('share_count', 0), 'url': res.body.get('id', url), 'service': this() }
+        return { 'count': res.body.get('share', {}).get('share_count', 0), 'id': res.body.get('id', id), 'service': this() }
 
-    def google_plus(self, url=None):
-        url = self._get_url(url)
+    def google_plus(self, id=None):
+        id = self._get_id(id)
         data = [{ 'method' : 'pos.plusones.get',
                   'id' : 'p',
                   'params': { 'nolog' : True,
-                              'id' : url,
+                              'id' : id,
                               'source' : 'widget',
                               'userId' : '@viewer',
                               'groupId' : '@self' },
@@ -98,33 +103,33 @@ class Shares(object):
 
         r = res.body[0].get('result', {})
 
-        return { 'count': parse_int(r.get('metadata', {}).get('globalCounts', {}).get('count', 0)), 'url': r.get('id', url), 'service': this() }
+        return { 'count': parse_int(r.get('metadata', {}).get('globalCounts', {}).get('count', 0)), 'id': r.get('id', id), 'service': this() }
 
-    def linkedin(self, url=None):
-        url = self._get_url(url)
-        res = unirest.get('http://www.linkedin.com/countserv/count/share?url=%s' % url)
+    def linkedin(self, id=None):
+        id = self._get_id(id)
+        res = unirest.get('http://www.linkedin.com/countserv/count/share?url=%s' % id)
 
         if res.code != 200:
             return 0
 
         r = parse_jsonp(res.body)
 
-        return { 'count': r.get('count', 0), 'url': r.get('url', url), 'service': this() }
+        return { 'count': r.get('count', 0), 'id': r.get('url', id), 'service': this() }
 
-    def pinterest(self, url=None):
-        url = self._get_url(url)
-        res = unirest.get('http://api.pinterest.com/v1/urls/count.json?callback=www&url=%s' % url)
+    def pinterest(self, id=None):
+        id = self._get_id(id)
+        res = unirest.get('http://api.pinterest.com/v1/urls/count.json?callback=www&url=%s' % id)
 
         if res.code != 200:
             return None
 
         r = parse_jsonp(res.body)
 
-        return { 'count': r.get('count', 0), 'url': r.get('url', url), 'service': this() }
+        return { 'count': r.get('count', 0), 'id': r.get('url', id), 'service': this() }
 
-    def pocket(self, url=None):
-        url = self._get_url(url)
-        res = unirest.get('https://widgets.getpocket.com/v1/button?align=center&count=vertical&label=pocket&url=%s' % url)
+    def pocket(self, id=None):
+        id = self._get_id(id)
+        res = unirest.get('https://widgets.getpocket.com/v1/button?align=center&count=vertical&label=pocket&url=%s' % id)
 
         if res.code != 200:
             return None
@@ -133,42 +138,42 @@ class Shares(object):
         soup = BeautifulSoup(html)
         cnt = soup.find(id="cnt")
 
-        return { 'count': parse_int(cnt.text), 'url': url, 'service': this() }
+        return { 'count': parse_int(cnt.text), 'id': id, 'service': this() }
 
-    def reddit(self, url=None):
-        url = self._get_url(url)
-        res = unirest.get('http://www.reddit.com/api/info.json?url=%s' % url)
+    def reddit(self, id=None):
+        id = self._get_id(id)
+        res = unirest.get('http://www.reddit.com/api/info.json?url=%s' % id)
 
         if res.code != 200:
             return None
 
         infos = res.body.get('data', {}).get('children', [])
 
-        return { 'count' : len(infos), 'url': url, 'service': this() }
+        return { 'count': len(infos), 'id': id, 'service': this() }
 
-    def stumbleupon(self, url=None):
-        url = self._get_url(url)
-        res = unirest.get('http://www.stumbleupon.com/services/1.01/badge.getinfo?url=%s' % url)
+    def stumbleupon(self, id=None):
+        id = self._get_id(id)
+        res = unirest.get('http://www.stumbleupon.com/services/1.01/badge.getinfo?url=%s' % id)
 
         if res.code != 200:
             return None
 
         r = res.body.get('result', {})
 
-        return { 'count': r.get('views', 0), 'url': r.get('url', url), 'service': this() }
+        return { 'count': r.get('views', 0), 'id': r.get('url', id), 'service': this() }
 
-    def twitter(self, url=None):
-        url = self._get_url(url)
-        res = unirest.get('http://cdn.api.twitter.com/1/urls/count.json?url=%s' % url)
+    def twitter(self, id=None):
+        id = self._get_id(id)
+        res = unirest.get('http://cdn.api.twitter.com/1/urls/count.json?url=%s' % id)
 
         if res.code != 200:
             return None
 
-        return { 'count': res.body.get('count', 0), 'url': res.body.get('url', url), 'service': this() }
+        return { 'count': res.body.get('count', 0), 'id': res.body.get('url', id), 'service': this() }
 
-    def vkontakte(self, url=None):
-        url = self._get_url(url)
-        res = unirest.get('https://vk.com/share.php?act=count&url=%s' % url)
+    def vkontakte(self, id=None):
+        id = self._get_id(id)
+        res = unirest.get('https://vk.com/share.php?act=count&url=%s' % id)
 
         if res.code != 200:
             return None
@@ -180,12 +185,83 @@ class Shares(object):
         else:
             count = 0
 
-        return { 'count': count, 'url': url, 'service': this() }
+        return { 'count': count, 'id': id, 'service': this() }
+
+class Followers(SocialBase):
+
+    def __init__(self, id=None, gp_key=None):
+        SocialBase.__init__(self, id)
+        self.gp_key = gp_key
+
+    def google_plus(self, id=None):
+        id = self._get_id(id)
+
+        res = unirest.get('https://www.googleapis.com/plus/v1/people/%s?key=%s' % (id, self.gp_key))
+
+        if res.code != 200:
+            return None
+
+        count = res.body.get('plusOneCount', 0) or res.body.get('circledByCount', 0)
+
+        return { 'count': count, 'id': r.get('id', id), 'service': this() }
+
+class Counter(SocialBase):
+
+    def __init__(self, id=None):
+        SocialBase.__init__(self, id)
+
+    def reddit(self, id=None):
+        id = self._get_id(id)
+        res = unirest.get('http://www.reddit.com/api/info.json?url=%s' % id)
+
+        if res.code != 200:
+            return None
+
+        infos = res.body.get('data', {}).get('children', [])
+
+        ups = downs = score = 0
+
+        for i in infos:
+            data = i.get('data', {})
+            ups += data.get('ups', 0)
+            downs += data.get('downs', 0)
+            score += data.get('score')
+
+        return { 'shares': len(infos), 'ups': ups, 'downs': downs, 'score': score, 'id': id, 'service': this() }
+
+    def youtube(self, id=None):
+        id = self._get_id(id)
+
+        if '?' in id:
+            query = id[id.find('?') + 1:]
+            params = query.split('&')
+
+            for p in params:
+                v = p.split('=')
+
+                if len(v)== 2 and v[0] == 'v':
+                    id = v[1]
+                    break
+
+        res = unirest.get('https://gdata.youtube.com/feeds/api/videos/%s?v=2&alt=json' % id)
+
+        if res.code != 200:
+            return None
+
+        r = res.body.get('entry', {})
+
+        return { 'views': r.get('yt$statistics', {}).get('viewCount', 0),
+                 'likes': r.get('yt$rating', {}).get('numLikes', 0),
+                 'dislikes': r.get('yt$rating', {}).get('numDislikes', 0),
+                 'favorites': r.get('yt$statistics', {}).get('favoriteCount', 0),
+                 'id': 'https://www.youtube.com/v/%s' % id,
+                 'service': this() }
+
 
 if __name__ == '__main__':
     import os
 
-    S = Shares('https://www.youtube.com/watch?v=9bZkp7q19f0', os.environ.get('FB_TOKEN', ''))
+    S = Shares('https://www.youtube.com/watch?v=9bZkp7q19f0', fb_token=os.environ.get('FB_TOKEN', ''))
     print('Buffer = %s' % S.buffer())
     print('Delicious = %s' % S.delicious())
     print('Facebook = %s' % S.facebook())
@@ -197,3 +273,10 @@ if __name__ == '__main__':
     print('StumbleUpon = %s' % S.stumbleupon())
     print('Twitter = %s' % S.twitter())
     print('VK = %s' % S.vkontakte())
+
+    F = Followers('google', gp_key=os.environ.get('GP_KEY', ''))
+    print('G+ = %s' % F.google_plus())
+
+    C = Counter('https://www.youtube.com/watch?v=9bZkp7q19f0')
+    print('Reddit = %s' % C.reddit())
+    print('YouTube = %s' % C.youtube())
