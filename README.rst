@@ -160,5 +160,6 @@ Getting access tokens
 
 -  `Facebook <https://developers.facebook.com/tools/access_token/>`__
 -  `Google Plus <https://developers.google.com/+/api/oauth>`__
+-  `SoundCloud <https://developers.soundcloud.com/docs/api/guide#authentication>`__
 -  `Twitter <https://dev.twitter.com/oauth/overview/application-owner-access-tokens>`__
 

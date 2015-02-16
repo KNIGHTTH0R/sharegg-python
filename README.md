@@ -148,4 +148,5 @@ YouTube = {'service': 'youtube', 'views': u'2242979096', 'dislikes': u'1205252',
 
 - [Facebook](https://developers.facebook.com/tools/access_token/)
 - [Google Plus](https://developers.google.com/+/api/oauth)
+- [SoundCloud](https://developers.soundcloud.com/docs/api/guide#authentication)
 - [Twitter](https://dev.twitter.com/oauth/overview/application-owner-access-tokens)
